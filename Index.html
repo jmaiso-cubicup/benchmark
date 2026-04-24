@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Knowledge Graph — Ecosistema & Conceptos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F6F3;
+  --bg2: #EFEEE9;
+  --bg3: #E6E4DC;
+  --text: #1A1917;
+  --text2: #6B6A65;
+  --text3: #9B9993;
+  --border: rgba(26,25,23,0.1);
+  --border2: rgba(26,25,23,0.18);
+  --accent: #1A1917;
+  --purple-bg: #EEEDFE; --purple-text: #3C3489;
+  --teal-bg: #E1F5EE; --teal-text: #0F6E56;
+  --amber-bg: #FAEEDA; --amber-text: #854F0B;
+  --coral-bg: #FAECE7; --coral-text: #993C1D;
+  --blue-bg: #E6F1FB; --blue-text: #185FA5;
+  --green-bg: #EAF3DE; --green-text: #3B6D11;
+  --gray-bg: #F1EFE8; --gray-text: #444441;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+/* LAYOUT */
+.shell { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; flex-shrink: 0; background: var(--bg2); border-right: 0.5px solid var(--border2); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.main { flex: 1; min-width: 0; padding: 2.5rem 3rem; max-width: 960px; }
+
+/* SIDEBAR */
+.brand { padding: 1.5rem 1.25rem 1rem; border-bottom: 0.5px solid var(--border); }
+.brand-name { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; }
+.brand-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.nav { padding: 1rem 0; flex: 1; }
+.nav-section { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; padding: 0 1.25rem; margin: 1rem 0 0.4rem; }
+.nav-item { display: block; padding: 6px 1.25rem; font-size: 13px; color: var(--text2); cursor: pointer; transition: all .15s; border-left: 2px solid transparent; text-decoration: none; }
+.nav-item:hover { color: var(--text); background: var(--bg3); }
+.nav-item.on { color: var(--text); font-weight: 500; border-left-color: var(--text); background: var(--bg3); }
+.sidebar-footer { padding: 1rem 1.25rem; border-top: 0.5px solid var(--border); font-size: 11px; color: var(--text3); }
+
+/* SECTIONS */
+.section { display: none; }
+.section.on { display: block; }
+.page-title { font-size: 22px; font-weight: 500; margin-bottom: 0.35rem; }
+.page-intro { font-size: 13px; color: var(--text2); margin-bottom: 2rem; line-height: 1.7; max-width: 600px; }
+.block-label { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem; }
+.divider { height: 0.5px; background: var(--border); margin: 2rem 0; }
+
+/* CONCEPT CARDS */
+.concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.ccard { background: #fff; border: 0.5px solid var(--border2); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.ccard:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.ccard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.ccard-name { font-size: 13px; font-weight: 500; }
+.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.ccard-def { font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 8px; }
+.ccard-more { font-size: 11px; color: var(--text3); }
+.detail { background: var(--bg2); border-radius: 10px; padding: 16px; margin-bottom: 12px; display: none; }
+.detail.on { display: block; }
+.detail-title { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+.detail-body { font-size: 12px; color: var(--text2); line-height: 1.7; }
+.detail-body ul { padding-left: 16px; margin-top: 6px; }
+.detail-body li { margin-bottom: 4px; }
+.detail-body strong { color: var(--text); font-weight: 500; }
+.detail-close { font-size: 11px; color: var(--text3); cursor: pointer; margin-top: 10px; display: inline-block; }
+
+/* ENG GRID */
+.eng-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.eng-card { background: #fff; border: 0.5px solid var(--border2); border-radius: 10px; padding: 14px; cursor: pointer; transition: border-color .15s; }
+.eng-card:hover { border-color: var(--accent); }
+.eng-level { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.eng-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.eng-analogy { font-size: 12px; color: var(--text2); font-style: italic; margin-bottom: 5px; }
+.eng-def { font-size: 11px; color: var(--text3); line-height: 1.4; }
+
+/* INFRA */
+.infra-item { background: #fff; border: 0.5px solid var(--border2); border-radius: 10px; padding: 13px 15px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+.infra-item:hover { border-color: var(--accent); }
+.infra-head { display: flex; align-items: center; justify-content: space-between; }
+.infra-title { font-size: 13px; font-weight: 500; }
+.infra-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.infra-chev { font-size: 11px; color: var(--text3); transition: transform .2s; }
+.infra-chev.open { transform: rotate(180deg); }
+.infra-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--border); }
+.infra-detail.on { display: block; }
+.prov-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+.prov-table th { text-align: left; color: var(--text3); font-weight: 500; padding: 3px 8px 6px 0; font-size: 11px; font-family: var(--mono); }
+.prov-table td { padding: 5px 8px 5px 0; color: var(--text2); vertical-align: top; }
+.prov-table tr:not(:last-child) td { border-bottom: 0.5px solid var(--border); }
+.prov-name { font-weight: 500; color: var(--text); }
+.badge { font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
+
+/* STARTUPS */
+.s-toolbar { margin-bottom: 1rem; }
+.search-wrap { position: relative; margin-bottom: 10px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; pointer-events: none; }
+.search-input { width: 100%; height: 36px; padding: 0 12px 0 34px; border-radius: 8px; border: 0.5px solid var(--border2); background: #fff; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; transition: border-color .15s; }
+.search-input:focus { border-color: var(--accent); }
+.sfilt { display: flex; gap: 5px; flex-wrap: wrap; }
+.sfb { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border2); background: #fff; color: var(--text2); cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 4px; font-family: var(--font); }
+.sfb:hover { border-color: var(--accent); color: var(--text); }
+.sfb.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.sfb-q { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.25); color: rgba(255,255,255,0.8); font-size: 9px; font-weight: 500; position: relative; }
+.sfb:not(.on) .sfb-q { background: var(--border); color: var(--text3); }
+.tooltip { display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; border-radius: 8px; padding: 8px 10px; font-size: 11px; line-height: 1.5; width: 200px; z-index: 100; white-space: normal; pointer-events: none; }
+.sfb-q:hover .tooltip { display: block; }
+.cat-box { background: var(--bg2); border-left: 2px solid var(--accent); border-radius: 0 8px 8px 0; padding: 10px 14px; margin: 10px 0; font-size: 12px; color: var(--text2); line-height: 1.6; display: none; }
+.cat-box.on { display: block; }
+.s-count { font-size: 12px; color: var(--text3); margin-bottom: 12px; font-family: var(--mono); }
+.startup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; }
+.scard { background: #fff; border: 0.5px solid var(--border2); border-radius: 10px; padding: 13px 15px; transition: border-color .15s, box-shadow .15s; }
+.scard:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.scard-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+.scard-name { font-size: 13px; font-weight: 500; }
+.scard-batch { font-size: 10px; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; }
+.scard-desc { font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 8px; }
+.scard-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+.scard-cat { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: var(--bg2); color: var(--text3); }
+.scard-pricing { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.scard-link { font-size: 11px; color: #185FA5; text-decoration: none; }
+.scard-link:hover { text-decoration: underline; }
+.empty { font-size: 13px; color: var(--text3); padding: 3rem 0; text-align: center; }
+
+@media (max-width: 720px) {
+  .shell { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; }
+  .main { padding: 1.5rem; }
+  .concept-grid, .eng-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-name">AI Knowledge</div>
+    <div class="brand-sub">Ecosistema & Conceptos</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Contenido</div>
+    <a class="nav-item on" data-s="conceptos" onclick="goTo('conceptos',this)">Conceptos clave</a>
+    <a class="nav-item" data-s="infra" onclick="goTo('infra',this)">Infraestructura</a>
+    <a class="nav-item" data-s="startups" id="nav-s" onclick="goTo('startups',this)">Startups</a>
+  </nav>
+  <div class="sidebar-footer">Cubicup · 2026</div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ══ CONCEPTOS ══ -->
+<div id="conceptos" class="section on">
+  <div class="page-title">De qué estamos hablando</div>
+  <div class="page-intro">Los conceptos que estructuran la próxima capa de IA empresarial. Pincha en cada tarjeta para ver el detalle.</div>
+
+  <div class="block-label">Tipos de grafos</div>
+  <div class="concept-grid">
+    <div class="ccard" onclick="td('d-kg')">
+      <div class="ccard-top"><span class="ccard-name">Knowledge graph</span><span class="tag" style="background:var(--purple-bg);color:var(--purple-text)">Estático</span></div>
+      <div class="ccard-def">Red de hechos interconectados. Sabe que el proyecto X aplica la normativa Y y lo gestiona Juan.</div>
+      <div class="ccard-more">+ ver detalle</div>
+    </div>
+    <div class="ccard" onclick="td('d-cg')">
+      <div class="ccard-top"><span class="ccard-name">Context graph</span><span class="tag" style="background:var(--teal-bg);color:var(--teal-text)">Dinámico</span></div>
+      <div class="ccard-def">Registro vivo de decisiones de la empresa — el "por qué" detrás de cada acción. El concepto del momento en enterprise AI (Foundation Capital, dic 2025).</div>
+      <div class="ccard-more">+ ver detalle</div>
+    </div>
+    <div class="ccard" onclick="td('d-ekg')">
+      <div class="ccard-top"><span class="ccard-name">Enterprise knowledge graph</span><span class="tag" style="background:var(--amber-bg);color:var(--amber-text)">Empresa</span></div>
+      <div class="ccard-def">El "cerebro" de la empresa. Mapa maestro de proyectos, clientes, normativas, equipos y documentos.</div>
+      <div class="ccard-more">+ ver detalle</div>
+    </div>
+    <div class="ccard" onclick="td('d-ecg')">
+      <div class="ccard-top"><span class="ccard-name">Enterprise context graph</span><span class="tag" style="background:var(--coral-bg);color:var(--coral-text)">Empleado</span></div>
+      <div class="ccard-def">El "radar" del empleado. Filtra el mar de información para mostrar solo lo relevante para tu tarea actual.</div>
+      <div class="ccard-more">+ ver detalle</div>
+    </div>
+  </div>
+
+  <div id="d-kg" class="detail">
+    <div class="detail-title">Knowledge graph — el saber general</div>
+    <div class="detail-body">Se basa en nodos (objetos) y aristas (relaciones). Para Cubicup: [Proyecto V-MA89] → aplica → [PGOU Málaga] → gestionado por → [Juan PM].<ul><li>Información estática — los hechos no cambian por el momento del día</li><li>Da a la IA una base sólida de verdades verificables, elimina alucinaciones</li><li>Elimina silos: une Monday con Drive con MongoDB en una sola respuesta</li></ul></div>
+    <span class="detail-close" onclick="td('d-kg')">cerrar ×</span>
+  </div>
+  <div id="d-cg" class="detail">
+    <div class="detail-title">Context graph — memoria institucional de decisiones</div>
+    <div class="detail-body">Concepto de Foundation Capital (dic 2025). El knowledge graph captura <em>qué</em> pasó. El context graph captura <em>por qué</em> pasó.<ul><li>Guarda trazas de decisiones: qué contexto había, qué excepciones se aprobaron, quién decidió qué</li><li>Con el tiempo forma la memoria institucional real de la empresa</li><li>Diferencia clave con RAG: RAG recupera documentos. El context graph guarda razonamiento y excepciones</li><li>Startups cercanas: Zep/Graphiti (temporal knowledge graphs), TrustGraph</li></ul></div>
+    <span class="detail-close" onclick="td('d-cg')">cerrar ×</span>
+  </div>
+  <div id="d-ekg" class="detail">
+    <div class="detail-title">Enterprise knowledge graph — el archivo central</div>
+    <div class="detail-body">Para Cubicup: proyectos, clientes, fases HL0-HL4, normativas por municipio, documentos por tipo.<ul><li>"Proyecto Málaga centro" → sabe que lo lleva Ana, está en HL3 y le falta la memoria de licencias</li><li>Elimina silos: une Monday con Drive con MongoDB con Holded en una respuesta</li></ul></div>
+    <span class="detail-close" onclick="td('d-ekg')">cerrar ×</span>
+  </div>
+  <div id="d-ecg" class="detail">
+    <div class="detail-title">Enterprise context graph — el asistente personal</div>
+    <div class="detail-body"><ul><li>"Resume el proyecto" → sabe que te refieres al que tienes abierto, no a uno de hace tres años</li><li>Contiene: correos recientes, proyecto abierto hace 10 min, tareas asignadas hoy en Monday</li></ul></div>
+    <span class="detail-close" onclick="td('d-ecg')">cerrar ×</span>
+  </div>
+
+  <div class="divider"></div>
+  <div class="block-label">RAG vs context graph — la diferencia clave</div>
+  <div class="ccard" onclick="td('d-rag-vs-cg')" style="margin-bottom:8px">
+    <div class="ccard-top"><span class="ccard-name">RAG / retrieval vs context graph</span><span class="tag" style="background:var(--blue-bg);color:var(--blue-text)">Comparación</span></div>
+    <div class="ccard-def">Son complementarios. RAG busca información. El context graph guarda razonamiento. Responden preguntas muy distintas.</div>
+    <div class="ccard-more">+ ver detalle</div>
+  </div>
+  <div id="d-rag-vs-cg" class="detail">
+    <div class="detail-title">RAG vs context graph — qué hace cada uno</div>
+    <div class="detail-body">
+      <strong>RAG</strong> responde: ¿qué información existe sobre este tema? Busca documentos, los fragmenta, los vectoriza y recupera los más relevantes.<br><br>
+      <strong>Context graph</strong> responde: ¿cómo hemos tomado decisiones similares antes? Guarda trazas de decisiones pasadas con su contexto completo.<br><br>
+      Ejemplo Cubicup:<ul>
+        <li><strong>RAG</strong>: "Busca los planos del proyecto V-MA89" → recupera los PDFs relevantes y los pasa al agente.</li>
+        <li><strong>Context graph</strong>: "¿Por qué en proyectos en Málaga siempre pedimos segunda revisión del aparejador?" → guarda que en 8 proyectos anteriores el técnico detectó un patrón de error y creó esa excepción. El agente aprende ese patrón.</li>
+      </ul>
+      RAG es la biblioteca. El context graph es la experiencia acumulada del equipo. Los sistemas más potentes de 2026 combinan ambos.
+    </div>
+    <span class="detail-close" onclick="td('d-rag-vs-cg')">cerrar ×</span>
+  </div>
+
+  <div class="ccard" onclick="td('d-graphrag')" style="margin-bottom:12px">
+    <div class="ccard-top"><span class="ccard-name">GraphRAG — la arquitectura que une todo</span><span class="tag" style="background:var(--blue-bg);color:var(--blue-text)">Arquitectura</span></div>
+    <div class="ccard-def">RAG clásico busca texto. GraphRAG navega relaciones del grafo. Para "proyectos en Málaga con licencia pendiente" consulta el grafo directamente. Microsoft Research (2024).</div>
+    <div class="ccard-more">+ ver detalle</div>
+  </div>
+  <div id="d-graphrag" class="detail">
+    <div class="detail-title">GraphRAG — cómo funciona</div>
+    <div class="detail-body">Navega el mapa de relaciones: Proyecto → está_en_municipio → Málaga, Proyecto → requiere → Licencia, NOT Proyecto → tiene_doc → Licencia_aprobada.<ul><li>Knowledge Graph: extrae entidades de tus sistemas (Cliente, Proyecto, Contrato)</li><li>Context Graph: integra Monday, Gmail, Calendario para saber en qué trabaja el usuario ahora</li><li>Resultado: respuestas imposibles de obtener con chatbot genérico o búsqueda en documentos</li></ul></div>
+    <span class="detail-close" onclick="td('d-graphrag')">cerrar ×</span>
+  </div>
+
+  <div class="divider"></div>
+  <div class="block-label">Las tres disciplinas de ingeniería</div>
+  <div class="eng-grid">
+    <div class="eng-card" onclick="td('d-prompt')">
+      <div class="eng-level" style="color:#888780">2022–2024</div>
+      <div class="eng-name">Prompt engineering</div>
+      <div class="eng-analogy">"Qué decirle al modelo"</div>
+      <div class="eng-def">Optimiza instrucciones individuales. Opera a nivel de mensaje único.</div>
+    </div>
+    <div class="eng-card" onclick="td('d-context')">
+      <div class="eng-level" style="color:#1D9E75">2025</div>
+      <div class="eng-name">Context engineering</div>
+      <div class="eng-analogy">"Qué mostrarle al modelo"</div>
+      <div class="eng-def">Diseña el entorno de información. Context window como RAM — qué cargar en cada momento.</div>
+    </div>
+    <div class="eng-card" onclick="td('d-harness')">
+      <div class="eng-level" style="color:#534AB7">2026+</div>
+      <div class="eng-name">Harness engineering</div>
+      <div class="eng-analogy">"Dónde trabaja el modelo"</div>
+      <div class="eng-def">Diseña el entorno completo: herramientas, límites, feedback loops, guardrails.</div>
+    </div>
+  </div>
+  <div id="d-prompt" class="detail" style="margin-top:8px">
+    <div class="detail-title">Prompt engineering — nivel de mensaje</div>
+    <div class="detail-body">El arte de formular bien la pregunta. Few-shot learning, chain-of-thought, role-playing.<ul><li>Influye pero no controla — no puede impedir que el agente haga cosas incorrectas</li><li>Útil para tareas simples. No escala solo en sistemas complejos</li></ul></div>
+    <span class="detail-close" onclick="td('d-prompt')">cerrar ×</span>
+  </div>
+  <div id="d-context" class="detail">
+    <div class="detail-title">Context engineering — nivel de sesión</div>
+    <div class="detail-body">Andrej Karpathy (2025): "el arte de llenar el context window con exactamente la información adecuada". Tobi Lütke (Shopify) lo identificó como la skill crítica de su organización.<ul><li>RAG, knowledge graphs y memory son herramientas de context engineering</li><li>Problema "lost in the middle": los modelos recuerdan mejor el inicio y final del contexto</li><li>Analogía: el brief ejecutivo curado por un chief of staff — filtra, organiza, prioriza</li></ul></div>
+    <span class="detail-close" onclick="td('d-context')">cerrar ×</span>
+  </div>
+  <div id="d-harness" class="detail">
+    <div class="detail-title">Harness engineering — nivel de sistema</div>
+    <div class="detail-body">Acuñado por Mitchell Hashimoto (co-fundador Terraform) en feb 2026. "Agent = Model + Harness". OpenAI generó 1M líneas de código de producción sin una sola línea manual.<ul><li>Incluye: constraints, feedback loops, guardrails, sandboxes, evals automáticos</li><li>Stripe genera 1.300 pull requests escritas por AI cada semana con harness bien configurado</li></ul></div>
+    <span class="detail-close" onclick="td('d-harness')">cerrar ×</span>
+  </div>
+</div>
+
+<!-- ══ INFRAESTRUCTURA ══ -->
+<div id="infra" class="section">
+  <div class="page-title">Qué hace falta para montarlo</div>
+  <div class="page-intro">Las piezas necesarias para construir un knowledge graph con capa de agentes. En orden de implementación. Pincha en cada pieza para ver los proveedores.</div>
+
+  <div class="block-label">Antes del código</div>
+  <div class="infra-item" onclick="ti(this)">
+    <div class="infra-head"><div><div class="infra-title">1. Disciplina de datos</div><div class="infra-sub">El prerrequisito — ninguna herramienta arregla datos sucios</div></div><span class="infra-chev">▾</span></div>
+    <div class="infra-detail"><ul style="font-size:12px;color:var(--text2);padding-left:16px;line-height:1.7"><li><strong>Clave única universal</strong>: un ID de proyecto idéntico en Monday, Drive, MongoDB y Holded.</li><li><strong>Campos bien rellenados</strong>: auditar qué campos superan el 80% de completitud.</li><li><strong>Convención de nombres</strong>: tipo_código_fecha.pdf para clasificación automática.</li></ul></div>
+  </div>
+  <div class="infra-item" onclick="ti(this)">
+    <div class="infra-head"><div><div class="infra-title">2. Modelo de datos (ontología)</div><div class="infra-sub">El mapa de entidades y relaciones — el trabajo más importante e infravalorado</div></div><span class="infra-chev">▾</span></div>
+    <div class="infra-detail"><ul style="font-size:12px;color:var(--text2);padding-left:16px;line-height:1.7"><li><strong>Entidades</strong>: Proyecto, Cliente, Persona, Fase, Documento, Normativa, Hito. Máx 7-8.</li><li><strong>Relaciones</strong>: Proyecto → contrata → Cliente, Proyecto → está_en → Fase.</li><li><strong>Validación</strong>: "¿proyectos en Málaga en HL3 con memoria sin entregar?" Si no responde, el schema está mal.</li></ul></div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="block-label">Infraestructura técnica</div>
+
+  <div class="infra-item" onclick="ti(this)">
+    <div class="infra-head"><div><div class="infra-title">3. Base de datos grafo</div><div class="infra-sub">Guarda nodos y relaciones — resuelve "¿qué falta entre A y B?"</div></div><span class="infra-chev">▾</span></div>
+    <div class="infra-detail">
+      <table class="prov-table"><colgroup><col style="width:32%"><col style="width:15%"><col style="width:20%"><col style="width:33%"></colgroup>
+        <tr><th>Proveedor</th><th>Tipo</th><th>Precio</th><th>Destaca por</th></tr>
+        <tr><td><span class="prov-name">Neo4j Aura</span><span class="badge" style="background:var(--green-bg);color:var(--green-text)">rec.</span></td><td>Cloud</td><td>Free → €65/mes</td><td>Estándar industria, UI visual</td></tr>
+        <tr><td><span class="prov-name">Memgraph</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>OSS</td><td>Free</td><td>Compatible Cypher, en memoria</td></tr>
+        <tr><td><span class="prov-name">FalkorDB</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>OSS</td><td>Free</td><td>Sobre Redis, el más ligero</td></tr>
+        <tr><td><span class="prov-name">Amazon Neptune</span></td><td>Cloud</td><td>~€0.10/h</td><td>Para ecosistema AWS</td></tr>
+        <tr><td><span class="prov-name">TigerGraph</span></td><td>Hybrid</td><td>Free tier</td><td>Más potente, overkill para empezar</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="infra-item" onclick="ti(this)">
+    <div class="infra-head"><div><div class="infra-title">4. Vector store</div><div class="infra-sub">Busca el significado semántico — no palabras exactas, sino conceptos</div></div><span class="infra-chev">▾</span></div>
+    <div class="infra-detail">
+      <table class="prov-table"><colgroup><col style="width:32%"><col style="width:15%"><col style="width:20%"><col style="width:33%"></colgroup>
+        <tr><th>Proveedor</th><th>Tipo</th><th>Precio</th><th>Destaca por</th></tr>
+        <tr><td><span class="prov-name">Qdrant Cloud</span><span class="badge" style="background:var(--green-bg);color:var(--green-text)">rec.</span></td><td>Managed</td><td>Free → €20/mes</td><td>Mejor latencia OSS, filtros</td></tr>
+        <tr><td><span class="prov-name">Pinecone</span></td><td>Cloud</td><td>Free → €70/mes</td><td>El más fácil de usar</td></tr>
+        <tr><td><span class="prov-name">Weaviate</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>Hybrid</td><td>Free OSS</td><td>Vector + keyword search nativo</td></tr>
+        <tr><td><span class="prov-name">Chroma</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>OSS</td><td>Gratis</td><td>3 líneas de Python, para dev</td></tr>
+        <tr><td><span class="prov-name">pgvector</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>Extensión</td><td>Gratis</td><td>Si ya tienes Postgres</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="infra-item" onclick="ti(this)">
+    <div class="infra-head"><div><div class="infra-title">5. Modelo de embeddings</div><div class="infra-sub">Convierte texto en vectores numéricos que representan el significado</div></div><span class="infra-chev">▾</span></div>
+    <div class="infra-detail">
+      <table class="prov-table"><colgroup><col style="width:38%"><col style="width:12%"><col style="width:18%"><col style="width:32%"></colgroup>
+        <tr><th>Proveedor</th><th>Tipo</th><th>Precio</th><th>Destaca por</th></tr>
+        <tr><td><span class="prov-name">text-embedding-3-small</span><span class="badge" style="background:var(--green-bg);color:var(--green-text)">rec.</span></td><td>API</td><td>€0.02/1M tok</td><td>Calidad contrastada, mínimo coste</td></tr>
+        <tr><td><span class="prov-name">text-embedding-3-large</span></td><td>API</td><td>€0.13/1M tok</td><td>Más calidad para docs técnicos</td></tr>
+        <tr><td><span class="prov-name">Cohere Embed v3</span></td><td>API</td><td>€0.10/1M tok</td><td>Mejor para español/inglés</td></tr>
+        <tr><td><span class="prov-name">sentence-transformers</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>Local</td><td>Gratis</td><td>Sin coste API, necesitas GPU</td></tr>
+        <tr><td><span class="prov-name">Nomic Embed</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>OSS</td><td>Gratis OSS</td><td>8192 tokens, corre local</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="infra-item" onclick="ti(this)">
+    <div class="infra-head"><div><div class="infra-title">6. Compute para ingestión</div><div class="infra-sub">Ejecuta scripts que leen PDFs y actualizan el grafo — pagas solo cuando corre</div></div><span class="infra-chev">▾</span></div>
+    <div class="infra-detail">
+      <table class="prov-table"><colgroup><col style="width:30%"><col style="width:18%"><col style="width:18%"><col style="width:34%"></colgroup>
+        <tr><th>Proveedor</th><th>Tipo</th><th>Precio</th><th>Destaca por</th></tr>
+        <tr><td><span class="prov-name">Modal</span><span class="badge" style="background:var(--green-bg);color:var(--green-text)">rec.</span></td><td>Serverless Py</td><td>~€0.00003/s</td><td>Deploy con decorador, sin Docker</td></tr>
+        <tr><td><span class="prov-name">GitHub Actions</span><span class="badge" style="background:var(--green-bg);color:var(--green-text)">rec.</span></td><td>CI/CD cron</td><td>Gratis 2000min</td><td>Para syncs diarios simples</td></tr>
+        <tr><td><span class="prov-name">AWS Lambda</span></td><td>Serverless</td><td>Gratis 1M exec</td><td>Flexible, para ecosistema AWS</td></tr>
+        <tr><td><span class="prov-name">Google Cloud Run</span></td><td>Containers</td><td>Pay-per-use</td><td>Docker sin gestionar servidores</td></tr>
+        <tr><td><span class="prov-name">Prefect</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>Workflow</td><td>Free OSS</td><td>Para jobs que dependen entre sí</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="infra-item" onclick="ti(this)">
+    <div class="infra-head"><div><div class="infra-title">7. Servidor MCP y agente</div><div class="infra-sub">El proceso always-on que recibe preguntas y devuelve respuestas</div></div><span class="infra-chev">▾</span></div>
+    <div class="infra-detail">
+      <table class="prov-table"><colgroup><col style="width:28%"><col style="width:14%"><col style="width:18%"><col style="width:40%"></colgroup>
+        <tr><th>Proveedor</th><th>Tipo</th><th>Precio</th><th>Destaca por</th></tr>
+        <tr><td><span class="prov-name">Railway</span><span class="badge" style="background:var(--green-bg);color:var(--green-text)">rec.</span></td><td>PaaS</td><td>€5–15/mes</td><td>Deploy desde GitHub en 3 min</td></tr>
+        <tr><td><span class="prov-name">Render</span></td><td>PaaS</td><td>Free → €7/mes</td><td>Similar a Railway</td></tr>
+        <tr><td><span class="prov-name">Fly.io</span></td><td>PaaS</td><td>€3–10/mes</td><td>El más barato</td></tr>
+        <tr><td><span class="prov-name">Coolify</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>Self-hosted</td><td>Gratis + VPS</td><td>Tu propio Railway open source</td></tr>
+        <tr><td><span class="prov-name">Hetzner + PM2</span><span class="badge" style="background:var(--blue-bg);color:var(--blue-text)">OSS</span></td><td>IaaS</td><td>€4–6/mes</td><td>El más barato con Linux</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="infra-item" onclick="ti(this)">
+    <div class="infra-head"><div><div class="infra-title">8. Conectores de datos</div><div class="infra-sub">Un script por fuente — sincronizan cada sistema con el grafo</div></div><span class="infra-chev">▾</span></div>
+    <div class="infra-detail"><ul style="font-size:12px;color:var(--text2);padding-left:16px;line-height:1.7"><li><strong>Monday → Neo4j</strong>: API GraphQL, boards HL0-HL4, cron diario. ~4h de ingeniería.</li><li><strong>Drive / Autodesk Docs → Qdrant</strong>: webhook, PyMuPDF, chunking 512 tokens, embeddings. ~6-8h.</li><li><strong>Holded → Neo4j</strong>: REST API, sync diario de facturas. ~3h.</li><li><strong>Gmail → Neo4j</strong>: LLM extrae hitos de threads. Opcional para fase inicial.</li><li><strong>MongoDB (existente)</strong>: ya tenéis MCP de lectura — el conector más valioso ya está hecho.</li></ul></div>
+  </div>
+</div>
+
+<!-- ══ STARTUPS ══ -->
+<div id="startups" class="section">
+  <div class="page-title">Ecosistema de startups</div>
+  <div class="page-intro">Las compañías más relevantes del espacio con descripciones actualizadas. Filtra por categoría o busca por nombre.</div>
+
+  <div class="s-toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input class="search-input" id="srch" type="text" placeholder="Buscar por nombre, descripción o categoría..." oninput="renderS()">
+    </div>
+    <div class="sfilt" id="sfilt">
+      <button class="sfb on" data-f="all" onclick="setF('all',this)">Todas</button>
+      <button class="sfb" data-f="grafo" onclick="setF('grafo',this)">Knowledge graph <span class="sfb-q">?<span class="tooltip">Bases de datos de relaciones. Responden "¿qué conecta A con B?" o "¿qué le falta al proyecto para pasar de fase?"</span></span></button>
+      <button class="sfb" data-f="memoria" onclick="setF('memoria',this)">Memoria agentes <span class="sfb-q">?<span class="tooltip">Persistencia entre sesiones para agentes AI. Sin esto, cada conversación empieza desde cero.</span></span></button>
+      <button class="sfb" data-f="plataforma" onclick="setF('plataforma',this)">Plataforma / OS <span class="sfb-q">?<span class="tooltip">Construye apps y agentes sobre tus sistemas existentes sin montar infraestructura desde cero.</span></span></button>
+      <button class="sfb" data-f="rag" onclick="setF('rag',this)">RAG / retrieval <span class="sfb-q">?<span class="tooltip">El pipeline entre tus documentos y el LLM. Fragmenta, vectoriza y recupera los más relevantes antes de responder.</span></span></button>
+      <button class="sfb" data-f="search" onclick="setF('search',this)">Enterprise search <span class="sfb-q">?<span class="tooltip">Búsqueda inteligente sobre todos los sistemas de la empresa con permisos granulares. Indexa 100+ apps.</span></span></button>
+      <button class="sfb" data-f="docs" onclick="setF('docs',this)">Documentación AI <span class="sfb-q">?<span class="tooltip">Documentación para humanos y agentes AI. Si está desactualizada, el agente da respuestas incorrectas con total confianza.</span></span></button>
+      <button class="sfb" data-f="infra" onclick="setF('infra',this)">Infra agentes <span class="sfb-q">?<span class="tooltip">MCP servers, staging, testing agéntico, orquestadores. El scaffolding técnico que hace que los agentes funcionen de forma fiable.</span></span></button>
+      <button class="sfb" data-f="enterprise" onclick="setF('enterprise',this)">Enterprise AI <span class="sfb-q">?<span class="tooltip">Plataformas completas: LLMs propios, agentes, apps y gobierno de datos. El sistema operativo de AI para grandes empresas.</span></span></button>
+      <button class="sfb" data-f="vertical" onclick="setF('vertical',this)">Agente vertical <span class="sfb-q">?<span class="tooltip">Agentes especializados en un dominio (seguros, construcción, logística). Conocen la terminología y excepciones de su industria.</span></span></button>
+      <button class="sfb" data-f="ops" onclick="setF('ops',this)">Ops / back-office <span class="sfb-q">?<span class="tooltip">Automatizan finance, supply chain, IT, HR, compliance. ROI claro y medible desde el primer mes.</span></span></button>
+      <button class="sfb" data-f="gtm" onclick="setF('gtm',this)">GTM / ventas <span class="sfb-q">?<span class="tooltip">Prospección, outreach, CRM, revenue ops. Del lead a la factura con menos intervención humana.</span></span></button>
+    </div>
+    <div class="cat-box" id="cat-box"></div>
+  </div>
+
+  <div class="s-count" id="scount"></div>
+  <div class="startup-grid" id="sgrid"></div>
+</div>
+
+</main>
+</div>
+
+<script>
+const CL={grafo:'Knowledge graph',memoria:'Memoria agentes',plataforma:'Plataforma / OS',rag:'RAG / retrieval',search:'Enterprise search',docs:'Documentación AI',infra:'Infra agentes',enterprise:'Enterprise AI',vertical:'Agente vertical',ops:'Ops / back-office',gtm:'GTM / ventas'};
+const CD={
+  all:'',
+  grafo:'<strong>Knowledge graph</strong> — bases de datos de relaciones entre entidades empresariales. Guardan nodos (cosas) y aristas (cómo se conectan). Responden preguntas como "¿qué normativa aplica a este proyecto?" sin múltiples queries manuales.',
+  memoria:'<strong>Memoria de agentes</strong> — capas de persistencia que permiten a los agentes AI recordar entre sesiones. Es la diferencia entre un chatbot que olvida todo y un asistente que realmente aprende de cada interacción.',
+  plataforma:'<strong>Plataforma / OS de agentes</strong> — sistemas para construir apps y agentes sobre tu stack existente sin montar infraestructura desde cero. Algunos son no-code, otros son frameworks para desarrolladores.',
+  rag:'<strong>RAG / retrieval</strong> — el pipeline entre tus documentos y el LLM. Fragmenta documentos, los vectoriza y recupera los más relevantes antes de responder. Diferencia clave con el context graph: RAG recupera información; el context graph guarda razonamiento y decisiones.',
+  search:'<strong>Enterprise search</strong> — búsqueda inteligente sobre todos los sistemas de la empresa con permisos granulares. Va más allá del RAG clásico: indexa 100+ apps y entiende quién puede ver qué.',
+  docs:'<strong>Documentación AI</strong> — plataformas para crear documentación que consumen tanto humanos como agentes AI. Si tu doc está desactualizada, el agente da respuestas incorrectas con total confianza.',
+  infra:'<strong>Infraestructura de agentes</strong> — MCP servers, entornos de staging, testing agéntico, orquestadores. El scaffolding técnico que hace que los agentes funcionen de forma fiable en producción.',
+  enterprise:'<strong>Enterprise AI</strong> — plataformas completas con LLMs propios, agentes, apps internas y gobierno de datos. Son el sistema operativo de AI para grandes empresas, compitiendo directamente con Microsoft Copilot.',
+  vertical:'<strong>Agente vertical</strong> — agentes especializados en un dominio concreto. Conocen la terminología, flujos de trabajo y excepciones de su industria. Más profundos que las plataformas horizontales.',
+  ops:'<strong>Ops / back-office</strong> — agentes que automatizan procesos internos: finance, supply chain, IT, HR, compliance. El ROI es claro y medible desde el primer mes.',
+  gtm:'<strong>GTM / ventas</strong> — agentes para el ciclo comercial completo. Desde detectar señales de compra hasta hacer seguimiento, sin intervención humana.'
+};
+const SS=[
+  {n:'Neo4j',f:'grafo',b:'$200M ARR · $2B val',bc:'#F1EFE8',bt:'#444441',d:'Estándar de knowledge graphs. $200M ARR nov 2024. Fondo de $100M para startups GenAI.',p:'Free (Aura) → $65/mes',u:'https://neo4j.com'},
+  {n:'TigerGraph',f:'grafo',b:'Enterprise',bc:'#F1EFE8',bt:'#444441',d:'Grafos analíticos masivos para fraud detection. Integró TigerVector para búsqueda vectorial nativa.',p:'Free tier',u:'https://tigergraph.com'},
+  {n:'Memgraph',f:'grafo',b:'OSS',bc:'#E6F1FB',bt:'#0C447C',d:'Alternativa OSS a Neo4j compatible con Cypher. En memoria, más rápido para grafos con cambios frecuentes.',p:'Free OSS',u:'https://memgraph.com'},
+  {n:'Diffbot',f:'grafo',b:'$80M raised',bc:'#F1EFE8',bt:'#444441',d:'Knowledge graph con 1 billón de hechos de la web. LLM propio grounded en el grafo para cero alucinaciones.',p:'API pay-per-use',u:'https://diffbot.com'},
+  {n:'TrustGraph',f:'grafo',b:'OSS · Apache 2.0',bc:'#E6F1FB',bt:'#0C447C',d:'Plataforma OSS de context development. Multi-model storage y context cores portables. Clientes: Cisco, Intel, AstraZeneca, McKinsey, BNP Paribas.',p:'Free OSS',u:'https://trustgraph.ai'},
+  {n:'Writer',f:'enterprise',b:'Serie C $200M · $1.9B val',bc:'#FAEEDA',bt:'#633806',d:'Plataforma enterprise AI completa: LLMs propios (Palmyra), agentes, AI Studio y Knowledge Graph como capa de datos. Clientes: Accenture, Uber, Mars, Vanguard.',p:'Enterprise — request demo',u:'https://writer.com'},
+  {n:'Glean',f:'search',b:'Serie F $150M · $7.2B val',bc:'#FAEEDA',bt:'#633806',d:'El líder de enterprise AI search. Knowledge graph con permisos sobre 100+ apps SaaS. $200M ARR. 100M+ acciones de agentes al año.',p:'Enterprise — custom pricing',u:'https://glean.com'},
+  {n:'Guru',f:'search',b:'$70M raised',bc:'#FAEEDA',bt:'#633806',d:'AI search + wiki + intranet en una plataforma. Knowledge cards verificadas en Slack, Teams y Salesforce. $63M ARR.',p:'$15/usuario/mes (mín 10)',u:'https://getguru.com'},
+  {n:'Slite',f:'search',b:'$15.5M raised',bc:'#FAEEDA',bt:'#633806',d:'Knowledge base AI-first con "Ask": responde preguntas en lenguaje natural desde documentación interna. Clientes: Airbnb, WeTransfer.',p:'Free → $10/usuario/mes',u:'https://slite.com'},
+  {n:'Mintlify',f:'docs',b:'Serie B $45M',bc:'#FAECE7',bt:'#712B13',d:'Plataforma de documentación inteligente para humanos y agentes AI. 1M+ desarrolladores. Clientes: Anthropic, OpenAI, Cursor.',p:'Free → $150/mes',u:'https://mintlify.com'},
+  {n:'Mem0',f:'memoria',b:'YC S24 · $24M',bc:'#EEEDFE',bt:'#3C3489',d:'Capa de memoria persistente para agentes. 186M llamadas API en Q3 2025. 41k+ stars GitHub. Proveedor exclusivo del AWS Agent SDK.',p:'Free → $25/mes',u:'https://mem0.ai'},
+  {n:'Zep / Graphiti',f:'memoria',b:'OSS',bc:'#E6F1FB',bt:'#0C447C',d:'Temporal knowledge graphs para agentes — hechos con ventanas de validez. 20k+ stars. 94.8% en DMR. El más cercano al concepto de context graph de Foundation Capital.',p:'Free OSS → cloud',u:'https://getzep.com'},
+  {n:'Letta',f:'memoria',b:'Seed $10M · $70M val',bc:'#EAF3DE',bt:'#27500A',d:'Spin-out del paper MemGPT de UC Berkeley. Memoria auto-editable en tres niveles. Ángeles: Jeff Dean, Clem Delangue.',p:'Free OSS → cloud',u:'https://letta.com'},
+  {n:'Cognee',f:'memoria',b:'Seed €7.5M',bc:'#EAF3DE',bt:'#27500A',d:'Pipeline ECL (Extract-Cognify-Load). En producción en Bayer. Berlín, feb 2026.',p:'Free OSS → enterprise',u:'https://cognee.ai'},
+  {n:'Supermemory',f:'memoria',b:'Seed $3M',bc:'#EAF3DE',bt:'#27500A',d:'Latencia <300ms y >100B tokens mensuales. Fundador de 19 años. Oct 2025.',p:'Free tier',u:'https://supermemory.ai'},
+  {n:'Contextual AI',f:'rag',b:'Serie A $80M · $609M val',bc:'#EAF3DE',bt:'#27500A',d:'Fundada por Douwe Kiela, co-inventor del paper original de RAG en Meta. Clientes: Qualcomm, HSBC.',p:'Enterprise — request demo',u:'https://contextual.ai'},
+  {n:'Ragie',f:'rag',b:'Seed $5.5M',bc:'#EAF3DE',bt:'#27500A',d:'RAG-as-a-Service totalmente gestionado. Para equipos que no quieren construir el pipeline de ingestión propio.',p:'Free → $99/mes',u:'https://ragie.ai'},
+  {n:'Vectara',f:'rag',b:'Serie A $25M',bc:'#EAF3DE',bt:'#27500A',d:'RAG empresarial con Hughes Hallucination Evaluation Model (HHEM). Para industrias reguladas.',p:'Free → $599/mes',u:'https://vectara.com'},
+  {n:'LlamaIndex',f:'rag',b:'Serie A $19M',bc:'#EAF3DE',bt:'#27500A',d:'Framework de referencia para pipelines RAG. 150+ conectores. Clientes: Rakuten, Salesforce Agentforce, KPMG.',p:'Free OSS → LlamaCloud',u:'https://llamaindex.ai'},
+  {n:'Cohere',f:'rag',b:'Serie D $500M · $7B val',bc:'#EAF3DE',bt:'#27500A',d:'Rerank 3.5 es referencia de facto para re-ranking empresarial. $240M ARR. El estándar de embeddings.',p:'API pay-per-use',u:'https://cohere.com'},
+  {n:'Hermes Agent',f:'plataforma',b:'$50M · $1B val',bc:'#EEEDFE',bt:'#3C3489',d:'Agente OSS de Nous Research. Cliente y servidor MCP simultáneamente. Corre en 14+ plataformas de mensajería. Paradigm-backed.',p:'Free OSS + Nous Portal API',u:'https://hermes-agent.nousresearch.com'},
+  {n:'Rebolt',f:'plataforma',b:'YC W25 · $4M',bc:'#EEEDFE',bt:'#3C3489',d:'"Vibecoding para enterprise". Construye apps y agentes en lenguaje natural sobre tus sistemas. Fundadores españoles.',p:'Request demo',u:'https://rebolt.ai'},
+  {n:'Tasklet',f:'plataforma',b:'YC W25',bc:'#EEEDFE',bt:'#3C3489',d:'Automatiza tu negocio con agentes AI via MCP servers, APIs e integraciones nativas. Ejecuta workflows 24/7.',p:'Free beta',u:'https://tasklet.ai'},
+  {n:'Trace',f:'plataforma',b:'YC W25',bc:'#EEEDFE',bt:'#3C3489',d:'Orquestación de workflows con contexto compartido entre sistemas para equipos no técnicos + AI.',p:'Early access',u:'https://trace.so'},
+  {n:'Orchid',f:'plataforma',b:'1M+ users',bc:'#EEEDFE',bt:'#3C3489',d:'AI App Builder: construye apps y agentes usando tu suscripción de Claude, ChatGPT o Gemini. #1 en App Bench y UI Bench.',p:'Free con tu suscripción',u:'https://orchids.app'},
+  {n:'OpenWork',f:'plataforma',b:'YC W26 · OSS',bc:'#EEEDFE',bt:'#3C3489',d:'Alternativa OSS a Claude Cowork. Desktop app para 50+ LLMs con tus propias keys. Comparte skills y MCPs con el equipo.',p:'Free OSS → cloud',u:'https://openworklabs.com'},
+  {n:'TrustGraph',f:'plataforma',b:'OSS',bc:'#E6F1FB',bt:'#0C447C',d:'Context development platform. Infraestructura graph-native para almacenar y recuperar conocimiento estructurado.',p:'Free OSS',u:'https://trustgraph.ai'},
+  {n:'Rivet',f:'infra',b:'YC W23 · OSS',bc:'#EEEDFE',bt:'#3C3489',d:'Editor visual OSS para construir flujos con LLMs. Uno de los primeros builders agénticos del ecosistema.',p:'Free OSS',u:'https://rivet.ironcladapp.com'},
+  {n:'Opslane',f:'infra',b:'YC S24',bc:'#EEEDFE',bt:'#3C3489',d:'AI SRE para respuesta a incidentes y resolución autónoma en infraestructura cloud.',p:'Request demo',u:'https://opslane.com'},
+  {n:'Spur',f:'infra',b:'YC S24',bc:'#EEEDFE',bt:'#3C3489',d:'AI QA engineer que testea webs con lenguaje natural antes del despliegue.',p:'Free tier',u:'https://spureai.com'},
+  {n:'Scott AI',f:'infra',b:'YC W25',bc:'#EEEDFE',bt:'#3C3489',d:'Orquesta múltiples instancias de Claude Code y Codex en paralelo para equipos de ingeniería.',p:'Request demo',u:'https://scottai.dev'},
+  {n:'Dedalus Labs',f:'infra',b:'YC S25',bc:'#EEEDFE',bt:'#3C3489',d:'"Vercel para MCP servers": hostea y escala servidores MCP con autoscaling. De idea a producción en un click.',p:'Pay-per-use',u:'https://dedalus.ai'},
+  {n:'Archal',f:'infra',b:'YC S25',bc:'#EEEDFE',bt:'#3C3489',d:'Entorno de staging para agentes: clones stateful de servicios para testear antes de producción.',p:'Early access',u:'https://archal.ai'},
+  {n:'Bubble Lab',f:'infra',b:'YC S25 · OSS',bc:'#EEEDFE',bt:'#3C3489',d:'OSS TypeScript-native. Describe un workflow en lenguaje natural → código + visualización.',p:'Free OSS',u:'https://bubblelab.dev'},
+  {n:'Syntropy',f:'infra',b:'YC W26',bc:'#EEEDFE',bt:'#3C3489',d:'Ejecución agéntica de tests en sandboxes E2B generados por AI.',p:'Early access',u:'https://syntropy.dev'},
+  {n:'Parahelp',f:'vertical',b:'YC S24',bc:'#FAEEDA',bt:'#633806',d:'Tickets de soporte autónomos end-to-end para empresas SaaS.',p:'Request demo',u:'https://parahelp.com'},
+  {n:'PathPilot',f:'vertical',b:'YC S24',bc:'#FAEEDA',bt:'#633806',d:'CX agent que analiza replays de sesión, identifica fricciones y hace seguimiento.',p:'Request demo',u:'https://pathpilot.ai'},
+  {n:'FurtherAI',f:'vertical',b:'YC S24',bc:'#FAEEDA',bt:'#633806',d:'Automatiza back-office en brokerías de seguros: policy checking y propuestas.',p:'Request demo',u:'https://furtherlabs.ai'},
+  {n:'Userlens',f:'vertical',b:'YC F24',bc:'#FAEEDA',bt:'#633806',d:'Monitoriza cada usuario como el mejor CSM. Detecta churn y expansion, actúa en email/LinkedIn.',p:'Request demo',u:'https://userlens.io'},
+  {n:'Ressl AI',f:'vertical',b:'YC W25',bc:'#FAEEDA',bt:'#633806',d:'AI Salesforce Admins: configura, documenta y automatiza Salesforce en lenguaje natural.',p:'Request demo',u:'https://ressl.ai'},
+  {n:'Bond',f:'vertical',b:'YC S25',bc:'#FAEEDA',bt:'#633806',d:'AI Chief of Staff para CEOs. Visibilidad de toda la compañía en tiempo real. Ahorra 10+ h/semana.',p:'Request demo',u:'https://bond.ai'},
+  {n:'Brickanta',f:'vertical',b:'YC F25',bc:'#FAEEDA',bt:'#633806',d:'Cientos de agentes AI para construcción: análisis, licitaciones, procurement y gestión de riesgos.',p:'Enterprise',u:'https://brickanta.com'},
+  {n:'Flott',f:'vertical',b:'YC F25',bc:'#FAEEDA',bt:'#633806',d:'Centro de control AI para transporte y logística: planificación, tracking, facturación y pagos.',p:'Request demo',u:'https://flott.ai'},
+  {n:'Bravi',f:'vertical',b:'YC F25',bc:'#FAEEDA',bt:'#633806',d:'OS de AI para home services: reemplaza el front-office completo (llamadas, chats, seguimientos).',p:'Request demo',u:'https://bravi.ai'},
+  {n:'Artisan',f:'gtm',b:'YC W24 · $46M',bc:'#FAECE7',bt:'#712B13',d:'Plataforma de AI Workers con Ava (el primer AI BDR). Automatiza prospección end-to-end.',p:'$500/mes+',u:'https://artisan.co'},
+  {n:'Pulse AI',f:'ops',b:'YC S24',bc:'#F1EFE8',bt:'#444441',d:'Agentes AI para gestión de supply chain en grandes empresas.',p:'Request demo',u:'https://pulse.ai'},
+  {n:'Fazeshift',f:'ops',b:'YC S24',bc:'#F1EFE8',bt:'#444441',d:'Agente AI para accounts receivables: automatiza cobros y reconciliación.',p:'Request demo',u:'https://fazeshift.com'},
+  {n:'Dimely',f:'ops',b:'YC S24',bc:'#F1EFE8',bt:'#444441',d:'Agentes AI para equipos de finance en SaaS B2B.',p:'Request demo',u:'https://dimely.ai'},
+  {n:'Clicks',f:'ops',b:'YC W25',bc:'#F1EFE8',bt:'#444441',d:'AI BPO: reemplaza centros de servicio compartido con agentes sobre tus propias tools. SOC2 + HIPAA.',p:'Request demo',u:'https://clicks.so'},
+  {n:'Oxus',f:'ops',b:'YC W25',bc:'#F1EFE8',bt:'#444441',d:'Automatiza auditorías internas para empresas pre-IPO y públicas: scoping, documentación y control testing.',p:'Request demo',u:'https://oxus.ai'},
+  {n:'Modern',f:'ops',b:'YC F25',bc:'#F1EFE8',bt:'#444441',d:'Resuelve el 80%+ de peticiones de IT, HR y Finance sin intervención humana.',p:'Request demo',u:'https://modern.ai'},
+  {n:'Ovlo',f:'ops',b:'YC S25',bc:'#F1EFE8',bt:'#444441',d:'Plataforma no-code de AI para supply chain sobre el stack actual, incluyendo email y Sheets.',p:'Free tier',u:'https://ovlo.ai'},
+];
+
+const UNIQ=SS.filter((s,i,a)=>a.findIndex(x=>x.n===s.n)===i);
+document.getElementById('nav-s').textContent='Startups ('+UNIQ.length+')';
+let curF='all';
+
+function goTo(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if(el)el.classList.add('on');
+}
+function td(id){
+  const el=document.getElementById(id);
+  const on=el.classList.contains('on');
+  document.querySelectorAll('.detail').forEach(p=>p.classList.remove('on'));
+  if(!on)el.classList.add('on');
+}
+function ti(item){
+  const d=item.querySelector('.infra-detail');
+  const c=item.querySelector('.infra-chev');
+  const on=d.classList.contains('on');
+  document.querySelectorAll('.infra-detail').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.infra-chev').forEach(x=>x.classList.remove('open'));
+  if(!on){d.classList.add('on');c.classList.add('open');}
+}
+function setF(f,btn){
+  curF=f;
+  document.querySelectorAll('.sfb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('srch').value='';
+  const box=document.getElementById('cat-box');
+  if(CD[f]){box.innerHTML=CD[f];box.classList.add('on');}else{box.classList.remove('on');}
+  renderS();
+}
+function renderS(){
+  const q=(document.getElementById('srch').value||'').toLowerCase().trim();
+  if(q)document.getElementById('cat-box').classList.remove('on');
+  const seen=new Set();
+  const filtered=UNIQ.filter(s=>{
+    if(seen.has(s.n))return false;seen.add(s.n);
+    if(curF!=='all'&&s.f!==curF)return false;
+    if(!q)return true;
+    return(s.n+' '+s.d+' '+CL[s.f]).toLowerCase().includes(q);
+  });
+  document.getElementById('scount').textContent=filtered.length+' startup'+(filtered.length!==1?'s':'');
+  const grid=document.getElementById('sgrid');
+  if(!filtered.length){grid.innerHTML='<div class="empty">Sin resultados para "'+document.getElementById('srch').value+'"</div>';return;}
+  grid.innerHTML=filtered.map(s=>`<div class="scard">
+    <div class="scard-top"><span class="scard-name">${s.n}</span><span class="scard-batch" style="background:${s.bc};color:${s.bt}">${s.b}</span></div>
+    <div class="scard-desc">${s.d}</div>
+    <div class="scard-foot"><span class="scard-cat">${CL[s.f]}</span><span class="scard-pricing">${s.p}</span><a class="scard-link" href="${s.u}" target="_blank">visitar →</a></div>
+  </div>`).join('');
+}
+renderS();
+</script>
+</body>
+</html>
